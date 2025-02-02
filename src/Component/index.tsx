@@ -4,7 +4,6 @@ import { useState } from "react";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,19 +11,20 @@ export default function Login() {
     const formData = { email, password };
     console.log("Sending request:", formData);
 
-    const response = await fetch("/api/sendEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await response.json();
-    console.log("Response from server:", data);
+      console.log("Response status:", response.status);
 
-    if (response.ok) {
-      setMessage("User saved successfully!");
-    } else {
-      setMessage("Failed to save user. Error: " + data.error);
+      if (!response.ok) {
+        console.error("Failed request:", await response.json());
+      }
+    } catch (error) {
+      console.error("Network error:", error);
     }
   };
 
@@ -59,7 +59,6 @@ export default function Login() {
           >
             Log In
           </button>
-          {message && <p className="mt-4 text-sm text-red-600">{message}</p>}
         </form>
       </div>
     </div>

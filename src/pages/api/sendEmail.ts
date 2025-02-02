@@ -14,32 +14,29 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await client.connect();
         console.log('Connected successfully to MongoDB');
 
-        const db = client.db('Gunner'); // Make sure this matches your database name
-        const collection = db.collection('pass'); // Make sure this matches your collection name
+        const db = client.db('Gunner'); // Your database name
+        const collection = db.collection('users'); // Assuming you are storing user data here
 
         const { email, password } = req.body;
 
         if (!email || !password) {
-            console.log('Validation failed: Missing email or password');
+            console.log('Validation failed: Missing required fields');
             return res.status(400).json({ error: 'Email and password are required' });
         }
 
-        // Insert user data
+        // Insert the email and password into the database
         await collection.insertOne({ email, password });
 
-        console.log('User saved successfully!');
+        console.log('User data inserted successfully!');
         client.close();
 
-        return res.status(201).json({ message: 'User saved successfully' });
+        return res.status(200).json({ message: 'User data saved successfully' });
     } catch (error: unknown) {
-        // Check if the error is an instance of Error
         if (error instanceof Error) {
-            console.error('Error occurred:', error.message);  // Now it's safe to access error.message
-            return res.status(500).json({ error: error.message });
+            console.error('Error handling user data request:', error);
+            return res.status(500).json({ error: 'Internal Server Error', details: error.message });
         }
-
-        // If the error isn't an instance of Error, return a generic error message
-        console.error('Unknown error occurred');
-        return res.status(500).json({ error: 'An unknown error occurred' });
+        console.error('Unexpected error:', error);
+        return res.status(500).json({ error: 'Internal Server Error' });
     }
 }
