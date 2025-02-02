@@ -31,8 +31,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         client.close();
 
         return res.status(201).json({ message: 'User saved successfully' });
-    } catch (error: any) { // Cast error to 'any'
-        console.error('Error saving user:', error);
-        return res.status(500).json({ error: 'Internal Server Error', details: error.message });
-    }
+    } catch (error: unknown) {
+        const e = error as Error;  // Type assertion
+        console.log(e.message);  // Now TypeScript treats 'error' as an instance of Error
+      }
 }
