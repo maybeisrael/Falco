@@ -32,7 +32,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         return res.status(201).json({ message: 'User saved successfully' });
     } catch (error: unknown) {
-        const e = error as Error;  // Type assertion
-        console.log(e.message);  // Now TypeScript treats 'error' as an instance of Error
-      }
+        // Check if the error is an instance of Error
+        if (error instanceof Error) {
+            console.error('Error occurred:', error.message);  // Now it's safe to access error.message
+            return res.status(500).json({ error: error.message });
+        }
+
+        // If the error isn't an instance of Error, return a generic error message
+        console.error('Unknown error occurred');
+        return res.status(500).json({ error: 'An unknown error occurred' });
+    }
 }
