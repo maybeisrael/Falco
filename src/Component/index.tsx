@@ -12,7 +12,7 @@ export default function Login() {
     console.log("Sending request:", formData);
 
     try {
-      const response = await fetch("/api/user", {
+      const response = await fetch("/api/sendEmail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
