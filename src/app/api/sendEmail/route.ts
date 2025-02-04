@@ -1,11 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI || '';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
+export async function POST(request: Request) {
+    if (request.method !== 'POST') {
+        return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 });
     }
 
     try {
@@ -17,11 +17,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const db = client.db('Gunner'); // Your database name
         const collection = db.collection('users'); // Assuming you are storing user data here
 
-        const { email, password } = req.body;
+        const body = await request.json();
+        const { email, password } = body;
 
         if (!email || !password) {
             console.log('Validation failed: Missing required fields');
-            return res.status(400).json({ error: 'Email and password are required' });
+            return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
         }
 
         // Insert the email and password into the database
@@ -30,13 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('User data inserted successfully!');
         client.close();
 
-        return res.status(200).json({ message: 'User data saved successfully' });
+        return NextResponse.json({ message: 'User data saved successfully' }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.error('Error handling user data request:', error);
-            return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+            return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
         }
         console.error('Unexpected error:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
