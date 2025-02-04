@@ -1,46 +1,38 @@
-import { NextApiRequest, NextApiResponse } from 'next';  // Import missing types
-import { MongoClient, Db, Collection } from 'mongodb';
-
-interface User {
-    email: string;
-    password: string;
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { MongoClient } from 'mongodb';
 
 const uri = process.env.MONGODB_URI || '';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
+export async function POST(req: NextRequest) {
     try {
+        const body = await req.json();
+        const { email, password } = body;
+
+        if (!email || !password) {
+            return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+        }
+
         console.log('Connecting to MongoDB...');
         const client = new MongoClient(uri);
         await client.connect();
         console.log('Connected successfully to MongoDB');
 
-        const db: Db = client.db('Gunner');
-        const collection: Collection<User> = db.collection('users');  // Define the collection type
+        const db = client.db('Gunner'); // Your database name
+        const collection = db.collection('users'); // Assuming you are storing user data here
 
-        const { email, password } = req.body;
-
-        if (!email || !password) {
-            console.log('Validation failed: Missing email or password');
-            return res.status(400).json({ error: 'Email and password are required' });
-        }
-
+        // Insert the email and password into the database
         await collection.insertOne({ email, password });
 
-        console.log('User saved successfully!');
+        console.log('User data inserted successfully!');
         client.close();
 
-        return res.status(201).json({ message: 'User saved successfully' });
+        return NextResponse.json({ message: 'User data saved successfully' }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof Error) {
-            console.error('Error saving user:', error);
-            return res.status(500).json({ error: 'Internal Server Error', details: error.message });
+            console.error('Error handling user data request:', error);
+            return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
         }
         console.error('Unexpected error:', error);
-        return res.status(500).json({ error: 'Internal Server Error' });
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
