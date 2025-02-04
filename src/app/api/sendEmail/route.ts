@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
 import { MongoClient } from 'mongodb';
 
-// Load the MongoDB URI from environment variables
-const uri = process.env.MONGODB_URI || '';
-
-// Handle missing or invalid MongoDB URI
-if (!uri) {
-  console.error('MongoDB URI is missing or incorrect.');
-}
+// Hardcode MongoDB URI temporarily for testing
+const uri = 'mongodb+srv://buytok:chelsea1401@cluster0.x9afgcu.mongodb.net/Gunner?retryWrites=true&w=majority'; // Hardcoded URI for testing
 
 export async function POST(request: Request) {
   try {
@@ -16,7 +11,7 @@ export async function POST(request: Request) {
       console.error('Invalid MongoDB URI:', uri);
       return NextResponse.json({ error: 'Internal Server Error: Invalid MongoDB URI' }, { status: 500 });
     }
-    
+
     console.log('Connecting to MongoDB...');
     const client = new MongoClient(uri);
     await client.connect();
