@@ -1,33 +1,38 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { MongoClient } from "mongodb";
+import { NextRequest, NextResponse } from 'next/server';
+import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI as string; // Ensure you have this in .env.local
-const client = new MongoClient(uri);
+const uri = process.env.MONGODB_URI || '';
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method Not Allowed" });
-  }
+export async function POST(req: NextRequest) {
+    try {
+        const body = await req.json();
+        const { email, password } = body;
 
-  const { email, password } = req.body;
+        if (!email || !password) {
+            return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+        }
 
-  if (!email || !password) {
-    return res.status(400).json({ error: "Email and password are required" });
-  }
+        console.log('Connecting to MongoDB...');
+        const client = new MongoClient(uri);
+        await client.connect();
+        console.log('Connected successfully to MongoDB');
 
-  try {
-    await client.connect();
-    const db = client.db("Gunner"); // Replace with your database name
-    const usersCollection = db.collection("users");
+        const db = client.db('Gunner'); // Your database name
+        const collection = db.collection('users'); // Assuming you are storing user data here
 
-    const newUser = { email, password, createdAt: new Date() };
-    await usersCollection.insertOne(newUser);
+        // Insert the email and password into the database
+        await collection.insertOne({ email, password });
 
-    res.status(201).json({ success: true, message: "User saved successfully!" });
-  } catch (error) {
-    console.error("Error saving user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  } finally {
-    await client.close();
-  }
+        console.log('User data inserted successfully!');
+        client.close();
+
+        return NextResponse.json({ message: 'User data saved successfully' }, { status: 200 });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error('Error handling user data request:', error);
+            return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+        }
+        console.error('Unexpected error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
 }
