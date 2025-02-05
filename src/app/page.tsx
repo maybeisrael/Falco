@@ -1,10 +1,10 @@
-import Index from "./Component";
-
+import Hero from "./Component/Hero"
 
 export default function Home() {
   return (
     <div>
-         <Index />
+      <Hero />
+         
     </div>
   );
 }
