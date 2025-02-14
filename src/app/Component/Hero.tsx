@@ -1,102 +1,108 @@
-"use client"
+"use client";
 import Image from "next/image";
-import Mother from "./Mother";
 import Link from "next/link";
 import { useState } from "react";
+import Mother from "./Mother";
+import Dem from "./Dem";
+import { useRouter } from "next/navigation";
+import SecondModal from "./SecondModal";
 
 export default function CharityPage() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); // First modal state
+    const [isSecondModalOpen, setIsSecondModalOpen] = useState(false); // Second modal state
+    const router = useRouter();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen);
     };
 
+    const openModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    const confirmNavigation = () => {
+        setIsModalOpen(false);
+        setIsSecondModalOpen(true); // Open second modal
+    };
+
     return (
         <div className="bg-white text-black min-h-screen">
-            {/* Header */}
             <header className="flex justify-between items-center p-6 shadow-md px-6 sm:px-12 md:px-20">
-            <h1 className="text-2xl font-bold text-red-600">Save a Child</h1>
-            
-            {/* Mobile menu button */}
-            <button onClick={toggleMenu} className="md:hidden text-2xl text-red-600 ml-auto">
-                {isMenuOpen ? 'X' : '☰'}
-            </button>
+                <h1 className="text-2xl font-bold text-red-600">Save a Child</h1>
+                <button onClick={toggleMenu} className="md:hidden text-2xl text-red-600 ml-auto">
+                    {isMenuOpen ? 'X' : '☰'}
+                </button>
+                <nav>
+                    <ul className={`flex space-x-6 text-lg sm:text-xl md:text-2xl ${isMenuOpen ? "block" : "hidden md:flex"}`}>
+                        <li><Link href="#about" className="hover:text-red-600">About</Link></li>
+                        <li><Link href="#mission" className="hover:text-red-600">Our Mission</Link></li>
+                        <li><Link href="#contact" className="hover:text-red-600">Contact</Link></li>
+                    </ul>
+                </nav>
+            </header>
 
-            {/* Navigation */}
-            <nav>
-                {/* Display links only when menu is open on mobile */}
-                <ul className={`flex space-x-6 text-lg sm:text-xl md:text-2xl ${isMenuOpen ? "block" : "hidden md:flex"}`}>
-                    <li><Link href="#about" className="hover:text-red-600">About</Link></li>
-                    <li><Link href="#mission" className="hover:text-red-600">Our Mission</Link></li>
-                    <li><Link href="#contact" className="hover:text-red-600">Contact</Link></li>
-                </ul>
-            </nav>
-        </header>
-            {/* Hero Section with background */}
-            <section
-            className="relative bg-cover bg-center h-screen"
-            style={{ backgroundImage: "url('/map.png')" }}
-        >
-            <h1 className="text-[40px] sm:text-[55px] lg:text-[60px] font-semibold text-red-500 px-6 pt-10 sm:pt-20 md:pt-20 lg:pt-20">
-                Change a Child’s Life Today!
-            </h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 items-center px-6 md:px-[15px] lg:px-[30px]">
-                {/* Text Content on Left */}
-                <div className="mt-6 space-x-4 text-[15px] sm:text-[20px] md:text-[25px]">
-                    <p className="mt-4 text-lg sm:text-xl max-w-3xl mx-auto">
-                        Our charity has impacted thousands of children, providing them with the resources they need to thrive.
-                    </p>
-                    <div className="mt-6 flex flex-col sm:flex-row sm:space-x-4">
-                        <Link href="/">
-                            <button className="bg-red-500 text-white w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold">
-                                Donate Now
-                            </button>
-                        </Link>
-                        <Link href="/become-an-agent">
-                            <button className="bg-white border border-red-500 text-red-500 w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold mt-4 sm:mt-0">
+            <section className="relative bg-cover bg-center h-screen" style={{ backgroundImage: "url('/map.png')" }}>
+                <h1 className="text-[40px] sm:text-[55px] lg:text-[60px] font-semibold text-red-500 px-6 pt-10 sm:pt-20">
+                    Change a Child’s Life Today!
+                </h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 items-center px-6">
+                    <div className="mt-6 text-lg">
+                        <p className="mt-4 text-lg sm:text-xl max-w-3xl mx-auto">
+                            Our charity has impacted thousands of children, providing them with the resources they need to thrive.
+                        </p>
+                        <div className="mt-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+                            <Link href="/">
+                                <button className="bg-red-500 text-white w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold">
+                                    Donate Now
+                                </button>
+                            </Link>
+                            <button 
+                                onClick={openModal}
+                                className="bg-white border border-red-500 text-red-500 w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold transition hover:bg-red-500 hover:text-white"
+                            >
                                 Become an Agent
                             </button>
-                        </Link>
+                        </div>
+                    </div>
+                    <div className="w-full mt-6 md:mt-0 hidden md:block">
+                        <Image src="/childrenx.jpg" alt="Child in need" width={1000} height={800} className="rounded-lg shadow-lg w-full h-full object-cover" />
                     </div>
                 </div>
-
-                {/* Image on Right (Hidden on Small Screens) */}
-                <div className="w-full mt-6 md:mt-0 hidden md:block">
-                    <Image
-                        src="/childrenx.jpg"
-                        alt="Child in need"
-                        width={1000}
-                        height={800}
-                        className="rounded-lg shadow-lg w-full h-full object-cover"
-                    />
-                </div>
-            </div>
-        </section>
-
-            {/* Mother Section */}
-            <Mother />
-
-            {/* Call to Action */}
-            <section className="text-center py-16 px-6 bg-gray-50">
-                <h2 className="text-3xl sm:text-4xl font-bold text-red-500">Make a Difference</h2>
-                <p className="mt-4 text-lg sm:text-xl max-w-3xl mx-auto">
-                    Every donation, no matter the size, makes a real impact in a child&apos;s life.
-                </p>
-                <div className="mt-6 flex flex-col sm:flex-row sm:space-x-4">
-                        <Link href="/">
-                            <button className="bg-red-500 text-white w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold">
-                                Donate Now
-                            </button>
-                        </Link>
-                        <Link href="/become-an-agent">
-                            <button className="bg-white border border-red-500 text-red-500 w-[220px] h-[60px] sm:w-[200px] sm:h-[50px] rounded-lg font-semibold mt-4 sm:mt-0">
-                                Become an Agent
-                            </button>
-                        </Link>
-                    </div>
             </section>
 
-            {/* Footer */}
+            <Mother />
+            <Dem />
+
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-sm">
+                        <h2 className="text-xl font-semibold text-red-600">Are you sure?</h2>
+                        <p className="mt-2 text-gray-700">You are about to become an agent. Do you want to continue?</p>
+                        <div className="mt-4 flex justify-center gap-4">
+                            <button
+                                onClick={confirmNavigation}
+                                className="bg-red-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-600"
+                            >
+                                Yes, Continue
+                            </button>
+                            <button
+                                onClick={closeModal}
+                                className="bg-gray-300 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isSecondModalOpen && <SecondModal setIsSecondModalOpen={setIsSecondModalOpen} />}
+
             <footer className="text-center py-6 bg-gray-900">
                 <p className="text-gray-400">&copy; 2024 Save a Child. All rights reserved.</p>
             </footer>
