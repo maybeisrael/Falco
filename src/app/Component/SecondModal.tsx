@@ -16,6 +16,7 @@ const SecondModal: React.FC<SecondModalProps> = ({ setIsSecondModalOpen }) => {
     address: "",
     state: "",
   });
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -25,8 +26,9 @@ const SecondModal: React.FC<SecondModalProps> = ({ setIsSecondModalOpen }) => {
     e.preventDefault();
     console.log("User Data Submitted:", userData);
 
+    setIsSecondModalOpen(false); // Close modal before navigating
     router.push("/become-an-agent");
-  };
+};
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
